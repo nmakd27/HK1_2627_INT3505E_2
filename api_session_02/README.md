@@ -49,3 +49,10 @@
 <p align="center">
   <em>Hình 4-5. Trả response định dạng JSON</em>
 </p>
+
+## Bài tập về nhà 3
+
+![Tiêu đề có 'clean'](test/hw3_01.png)
+<p align="center">
+  <em>Hình 1. GET trả kèm ETag, If-None-Match trả 304 khi không đổi</em>
+</p>
