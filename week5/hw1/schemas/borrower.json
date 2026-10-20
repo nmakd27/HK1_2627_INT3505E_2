@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "required": ["cardId", "fullName", "status"],
+  "properties": {
+    "cardId": {
+      "type": "string",
+      "pattern": "^card_[a-z0-9]+$",
+      "description": "ID thẻ độc giả"
+    },
+    "fullName": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100,
+      "description": "Họ tên người mượn"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "suspended", "expired"],
+      "description": "Trạng thái thẻ độc giả"
+    }
+  }
+}

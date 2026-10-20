@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "required": ["id", "fullName"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^author_[a-z0-9]+$",
+      "description": "ID định danh tác giả (có prefix author_)"
+    },
+    "fullName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Họ tên tác giả"
+    },
+    "bio": {
+      "type": ["string", "null"],
+      "maxLength": 1000,
+      "description": "Tiểu sử tác giả"
+    }
+  }
+}
