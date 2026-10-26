@@ -1,0 +1,83 @@
+openapi: 3.0.3
+info:
+  title: Social Network API
+  version: 1.0.0
+
+paths:
+  /auth/login:
+    post:
+      summary: Đăng nhập
+      security: []  # không cần Auth / Scope
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken: { type: string }
+                  refreshToken: { type: string }
+        '400': { description: payload JSON sai định dạng hoặc thiếu trường bắt buộc }
+        '401': { description: Sai email hoặc mật khẩu }
+        '429': { description: Vượt quá số lần thử đăng nhập (rate limit) }
+
+  /auth/refresh:
+    post:
+      summary: Làm mới Access Token
+      security:
+        - bearerAuth: []  # yêu cầu refresh token
+      responses:
+        '200':
+          description: Cấp Token mới thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken: { type: string }
+        '400': { description: Thiếu token trong header/body hoặc token không hợp lệ }
+        '401': { description: Refresh token hết hạn hoặc không hợp lệ hoặc bị thu hồi }
+        '429': { description: Gửi request refresh liên tục (rate limit) }
+
+  /posts/{id}:
+    get:
+      summary: Xem chi tiết bài viết
+      security:
+        - bearerAuth: ["posts:read"]  # yêu cầu scope posts:read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Trả về chi tiết bài viết
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  content: { type: string }
+                  authorId: { type: string }
+        '401': { description: Access Token hết hạn hoặc không hợp lệ }
+        '403': { description: Thiếu scope `posts:read` hoặc vi phạm BOLA (bài viết riêng tư) }
+        '404': { description: Bài viết không tồn tại }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
