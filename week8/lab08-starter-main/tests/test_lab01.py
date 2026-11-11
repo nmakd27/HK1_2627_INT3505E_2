@@ -50,3 +50,24 @@ def test_delete_get_book(client, sample_book):
     get_response = client.get(f"/books/{book_id}")
     assert get_response.status_code == 404
     assert get_response.get_json()["code"] == "NOT_FOUND"
+
+def test_response_extra_field_blocked(client, sample_book):
+    book_id = sample_book
+    
+    response = client.get(f"/books/{book_id}")
+    assert response.status_code == 200
+    book_data = response.get_json()
+
+    schema = get_book_schema()
+    schema["additionalProperties"] = False
+
+    if "isbn" in schema.get("properties", {}):
+        schema["properties"]["isbn"]["type"] = ["string", "null"]
+
+    validate(instance=book_data, schema=schema)
+
+    book_data_with_extra_field = dict(book_data)
+    book_data_with_extra_field["unknown_field"] = "unexpected"
+
+    with pytest.raises(ValidationError):
+        validate(instance=book_data_with_extra_field, schema=schema)
