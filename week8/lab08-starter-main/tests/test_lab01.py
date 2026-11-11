@@ -35,7 +35,11 @@ def test_post_book_missing_title(client):
     response = client.post("/books", json={"author": "Author"})
     assert response.status_code == 400
     assert response.content_type == "application/json"
-    assert "title" in response.get_json()["errors"]
+
+    errors = response.get_json()["errors"]
+    errors_fields = [error["field"] for error in errors]
+
+    assert "title" in errors_fields
 
 def test_delete_get_book(client, sample_book):
     book_id = sample_book

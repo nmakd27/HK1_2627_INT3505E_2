@@ -1,0 +1,11 @@
+extends: ["spectral:oas", "spectral:asyncapi", "spectral:arazzo"]
+
+# custom rule: response 200 phải có nhiều hơn 0 trường trong schema
+rules:
+  response-200-has-schema-properties:
+    description: "Response 200 should have at least one property in the schema"
+    message: "Response 200 in {{path}} should have at least one property in the schema"
+    severity: error
+    given: "$.paths..responses['200'].content['application/json'].schema"
+    then:
+      function: truthy
