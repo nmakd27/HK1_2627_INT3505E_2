@@ -1,0 +1,158 @@
+openapi: 3.0.3
+info:
+  title: Users API Versioning Demo
+  description: API quản lý User hỗ trợ song song v1 (Deprecated) và v2
+  version: 2.0.0
+
+servers:
+  - url: http://localhost:5000
+    description: Local Development Server
+
+paths:
+  /v1/users/{uid}:
+    get:
+      summary: Lấy chi tiết User.
+      description: Trả về thông tin người dùng dạng `full_name`.
+      deprecated: true
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: ID người dùng
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Thành công
+          headers:
+            Sunset:
+              schema:
+                type: string
+              description: Thời điểm API v1 dừng hoạt động hoàn toàn.
+            Deprecation:
+              schema:
+                type: string
+              description: Đánh dấu API ở trạng thái deprecated.
+            Link:
+              schema:
+                type: string
+              description: Đường dẫn tới phiên bản v2 thay thế.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserV1Response'
+        '404':
+          description: Không tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v2/users/{uid}:
+    get:
+      summary: Lấy chi tiết User (v2)
+      description: Trả về thông tin người dùng tách biệt `first_name` và `last_name`.
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: ID người dùng
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserV2Response'
+        '404':
+          description: Không tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v2/users:
+    post:
+      summary: Tạo User mới (v2)
+      description: Tạo người dùng mới với thông tin `first_name`, `last_name` và `email`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserV2Request'
+      responses:
+        '201':
+          description: Tạo người dùng thành công
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL truy cập tài nguyên vừa tạo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserV2Response'
+        '400':
+          description: Yêu cầu không hợp lệ hoặc thiếu dữ liệu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    UserV1Response:
+      type: object
+      required:
+        - id
+        - full_name
+        - email
+      properties:
+        id:
+          type: integer
+        full_name:
+          type: string
+        email:
+          type: string
+
+    UserV2Response:
+      type: object
+      required:
+        - id
+        - first_name
+        - last_name
+        - email
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+
+    CreateUserV2Request:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
